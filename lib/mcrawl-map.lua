@@ -1,6 +1,7 @@
 local map = { 
 	tiles = {},
-
+	revealmap = {},
+	
 	max_x = 50,
 	max_y = 50,
 	max_rooms = 10,
@@ -12,7 +13,7 @@ local map = {
 
 -- MAP GENERATION
 
-function map.drawSquare(x,y,x2,y2)
+function map:drawSquare(x,y,x2,y2)
    xadder = 1
    yadder = 1
    if ( x > x2 ) then xadder = -1 end
@@ -28,12 +29,12 @@ function map.drawSquare(x,y,x2,y2)
    end
 end
 
-function map.doRoomsIntersect(room1,room2)
+local function doRoomsIntersect(room1,room2)
    if ( room1.x-2 < room2.x2 and room1.x2+2 > room2.x and room1.y-2 < room2.y2 and room1.y2+2 > room2.y ) then return true end
    return false
 end
 
-function map.isRoomOK(room)
+function map:isRoomOK(room)
    for i,croom in pairs(self.rooms)    do 
       
       if ( doRoomsIntersect(room,croom)) then return false end
@@ -42,7 +43,7 @@ function map.isRoomOK(room)
 end
 
 
-function map.drawRoom(room)
+function map:drawRoom(room)
    x = room.x
    y = room.y
    x2 = room.x2
@@ -51,7 +52,7 @@ function map.drawRoom(room)
 end
 
 
-function map.newRoom()
+function map:newRoom()
    local width = math.random(4,8)
    local height = math.random(4,8)
    local mx = math.random(2,self.max_x-width-1)
@@ -67,13 +68,13 @@ function map.newRoom()
    return room
 end
 
-function map.getRandomSpot(room)
+local function getRandomSpot(room)
    local x = room.x + math.random(0,room.w-1)
    local y = room.y + math.random(0,room.h-1)
    return x,y
 end
 
-function map.drawPath(room1,room2)
+function map:drawPath(room1,room2)
    startX, startY = getRandomSpot(room1)
    endX, endY = getRandomSpot(room2)
    
@@ -87,25 +88,25 @@ function map.drawPath(room1,room2)
 
 end
 
-function map.revealRoom(room)
+function map:revealRoom(room)
    room.revealed = true
    for x=room.x-1,room.x2+1 do
       for y=room.y-1,room.y2+1 do
-         revealMap[x][y] = 1
+         self.revealMap[x][y] = 1
       end
    end
 end
 
 
-function map.revealTunnel(player)
+function map:revealTunnel(player)
    for x=player.x-1,player.x+1 do
       for y=player.y-1,player.y+1 do
-         revealMap[x][y] = 1
+         self.revealMap[x][y] = 1
       end
    end
 end   
 
-function map.getPlayerRoom(player)
+function map:getPlayerRoom(player)
    for i,room in pairs(self.rooms) do
       if ( player.x >= room.x and player.x <= room.x2 and player.y >= room.y and player.y <= room.y2 ) then return room end
    end
@@ -113,7 +114,7 @@ function map.getPlayerRoom(player)
 end
 
 
-function map.changeReveal(player)
+function map:changeReveal(player)
    local playerRoom = getPlayerRoom(player)
    if ( playerRoom ~= 0 ) then
       if ( playerRoom.revealed ~= true ) then
@@ -125,15 +126,15 @@ function map.changeReveal(player)
 end
 
 
-function map.generateMap() 
+function map:generateMap() 
    self.tiles = {}
-   revealMap = {}
+   self.revealMap = {}
    for x=1,self.max_x do  -- Clear Map
       self.tiles[x] = {}
-     revealMap[x] = {}
+     self.revealMap[x] = {}
       for y=1,self.max_y do
          self.tiles[x][y] = "#"
-       revealMap[x][y] = 0
+       self.revealMap[x][y] = 0
       end
    end
    
