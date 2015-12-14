@@ -18,3 +18,5 @@ local player = {
    inventory = {}
    
 }
+
+return player

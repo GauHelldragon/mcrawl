@@ -20,9 +20,9 @@ function map.drawSquare(x,y,x2,y2)
   
    for mx = x,x2,xadder do
       for my = y,y2,yadder do
-         if ( my >= 1 and my <= max_y and mx >= 1 and mx <= max_x ) then
-            if ( math.random() > 0.1 ) then tiles[mx][my] = "."
-            else tiles[mx][my] = "," end
+         if ( my >= 1 and my <= self.max_y and mx >= 1 and mx <= self.max_x ) then
+            if ( math.random() > 0.1 ) then self.tiles[mx][my] = "."
+            else self.tiles[mx][my] = "," end
          end
       end
    end
@@ -34,7 +34,7 @@ function map.doRoomsIntersect(room1,room2)
 end
 
 function map.isRoomOK(room)
-   for i,croom in pairs(rooms)    do 
+   for i,croom in pairs(self.rooms)    do 
       
       if ( doRoomsIntersect(room,croom)) then return false end
    end
@@ -54,8 +54,8 @@ end
 function map.newRoom()
    local width = math.random(4,8)
    local height = math.random(4,8)
-   local mx = math.random(2,max_x-width-1)
-   local my = math.random(2,max_y-height-1)
+   local mx = math.random(2,self.max_x-width-1)
+   local my = math.random(2,self.max_y-height-1)
    room = {
       x = mx,
       y = my,
@@ -106,7 +106,7 @@ function map.revealTunnel(player)
 end   
 
 function map.getPlayerRoom(player)
-   for i,room in pairs(map.rooms) do
+   for i,room in pairs(self.rooms) do
       if ( player.x >= room.x and player.x <= room.x2 and player.y >= room.y and player.y <= room.y2 ) then return room end
    end
    return 0
@@ -126,19 +126,19 @@ end
 
 
 function map.generateMap() 
-   tiles = {}
+   self.tiles = {}
    revealMap = {}
-   for x=1,max_x do  -- Clear Map
-      tiles[x] = {}
+   for x=1,self.max_x do  -- Clear Map
+      self.tiles[x] = {}
      revealMap[x] = {}
-      for y=1,max_y do
-         tiles[x][y] = "#"
+      for y=1,self.max_y do
+         self.tiles[x][y] = "#"
        revealMap[x][y] = 0
       end
    end
    
    local totalRooms = 0
-   for i=1,max_rooms do
+   for i=1,self.max_rooms do
       local newRoom = NewRoom()
       local tries = 1
       while ( not isRoomOK(newRoom) and tries < 10 ) do
@@ -146,24 +146,24 @@ function map.generateMap()
          newRoom = NewRoom()
       end
       if ( isRoomOK(newRoom) ) then 
-      table.insert(rooms,newRoom) 
+      table.insert(self.rooms,newRoom) 
       totalRooms = totalRooms + 1
      local ix, iy = getRandomSpot(newRoom)
      addNewFloorItem("Apple",ix,iy)
    end
    end
    
-   max_rooms = totalRooms
+   self.max_rooms = totalRooms
    
-   startRoom = rooms[1]
+   startRoom = self.rooms[1]
    player.x, player.y = getRandomSpot(startRoom)
    revealRoom(startRoom)
    
-   for i=1,max_rooms do
-     drawRoom(rooms[i])
+   for i=1,self.max_rooms do
+     drawRoom(self.rooms[i])
    end
-   for i=1,max_rooms-1 do 
-     drawPath(rooms[i],rooms[i+1])
+   for i=1,self.max_rooms-1 do 
+     drawPath(self.rooms[i],self.rooms[i+1])
    end
 end
 
