@@ -3,6 +3,7 @@ local term = require("term")
 local component = require("component")
 local map = require("mcrawl-map")
 local player = require("mcrawl-player")
+local items = require("mcrawl-items")
 
 local gpu = component.gpu
 local mry
@@ -38,7 +39,7 @@ function getMapTile(x,y)
    
    if ( map.revealMap[x][y] == 0 ) then return "*" end
    
-   local item = getItemAt(x,y)
+   local item = map.getItemAt(x,y)
    if ( item ~= nil ) then return item.icon end
    
    return map.tiles[x][y]
@@ -147,36 +148,6 @@ end
 
 -- PLAYER MOVEMENT
 
-function movePlayer(direction)
-   if ( direction == "up"    and player.y > 1  ) then tryToMovePlayer(player.x,player.y-1) end
-   if ( direction == "down"  and player.y < map.max_y ) then tryToMovePlayer(player.x,player.y+1) end
-   if ( direction == "left"  and player.x > 1  ) then tryToMovePlayer(player.x-1,player.y) end
-   if ( direction == "right" and player.x < map.max_x ) then tryToMovePlayer(player.x+1,player.y)  end  
-   if ( direction == "nw"    and player.x > 1 and
-                                 player.y > 1 ) then tryToMovePlayer(player.x-1,player.y-1) end
-   if ( direction == "ne"    and player.x < map.max_x and
-                                 player.y > 1 ) then tryToMovePlayer(player.x+1,player.y-1) end
-   if ( direction == "sw"    and player.x > 1 and
-                                 player.y < map.max_y ) then tryToMovePlayer(player.x-1,player.y+1) end
-   if ( direction == "se"    and player.x < map.max_x and
-                                 player.y < map.max_y ) then tryToMovePlayer(player.x+1,player.y+1) end
-
-                         
-   
-end
-
-function tryToMovePlayer(newx,newy)
-   tile = getMapTile(newx,newy)
-
-   if ( tile == "#" ) then return end
-   player.x = newx
-   player.y = newy
-   viewChange = true
-   map.changeReveal(player)
-   moved = true
-   endTurn = true
-   
-end
 
 function isKey(chara,str)
    return ( chara == string.byte(str) or chara == string.byte(string.upper(str)) ) 
@@ -212,14 +183,14 @@ function handleKey(address,chara,code,pname)
 	 return
    end
    
-   if ( isKey(chara,"w") or code == 200 ) then movePlayer("up") end
-   if ( isKey(chara,"x") or code == 208 ) then movePlayer("down") end
-   if ( isKey(chara,"a") or code == 203 ) then movePlayer("left") end
-   if ( isKey(chara,"d") or code == 205 ) then movePlayer("right") end
-   if ( isKey(chara,"q") or code == 199 ) then movePlayer("nw") end
-   if ( isKey(chara,"e") or code == 201 ) then movePlayer("ne") end
-   if ( isKey(chara,"z") or code == 207 ) then movePlayer("sw") end
-   if ( isKey(chara,"c") or code == 209 ) then movePlayer("se") end
+   if ( isKey(chara,"w") or code == 200 ) then player.movePlayer("up") end
+   if ( isKey(chara,"x") or code == 208 ) then player.movePlayer("down") end
+   if ( isKey(chara,"a") or code == 203 ) then player.movePlayer("left") end
+   if ( isKey(chara,"d") or code == 205 ) then player.movePlayer("right") end
+   if ( isKey(chara,"q") or code == 199 ) then player.movePlayer("nw") end
+   if ( isKey(chara,"e") or code == 201 ) then player.movePlayer("ne") end
+   if ( isKey(chara,"z") or code == 207 ) then player.movePlayer("sw") end
+   if ( isKey(chara,"c") or code == 209 ) then player.movePlayer("se") end
    if ( isKey(chara,"g") ) then playerGet() end
    if ( isKey(chara,"i") ) then showInventory() end
 end
@@ -230,108 +201,25 @@ end
 
 -- ITEMS
 
-function getItemAt(x,y)
-   for i,item in pairs(map.floorItems) do
-      if ( item.x == x and item.y == y ) then 
-      item.id = i
-      return item 
-     end
-   end
-end
-
 function addNewFloorItem(itemType,x,y,quantity)
-   local newItem = newItem(itemType,quantity)
+   local newItem = items.newItem(itemType,quantity)
    newItem.x = x
    newItem.y = y
    table.insert(map.floorItems,newItem)
 end
 
-function playerDropItem(item)
-   table.remove(player.inventory,item.id)
-   item.x = player.x
-   item.y = player.y
-   table.insert(map.floorItems,item)
-   if ( player.weapon == item ) then player.weapon = nil end
-   if ( player.armor == item ) then player.armor = nil end
-end
-
-function getPlayerItem(item)
-   for i,sitem in pairs(player.inventory) do
-      
-      if ( item.name == sitem.name ) then
-         sitem.id = i
-         return sitem
-      end
-   end
-end
-
-function playerGetItem(item)
-
-   table.remove(map.floorItems,item.id)
-   if ( item.iType == "emerald" ) then 
-      player.emeralds = player.emeralds + item.quantity
-      return
-   end
-   
-   if ( isItemStackable(item) ) then
-      existingItem = getPlayerItem(item)
-      if ( existingItem ~= nil ) then
-        if ( existingItem.quant >= 64 ) then return false end
-        existingItem.quant = math.min(existingItem.quant + item.quant,64)
-        return true
-      end
-   end
-   table.insert(player.inventory,item)
-   return true
-end
-
-function newItem(itemType,quantity)
-   if ( quantity == nil or quantity < 1 ) then quantity = 1 end
-   local retItem = {
-      name = itemType,
-      quant = quantity
-   }
-   
-   if ( itemType == "Emerald" ) then retItem.iType = "emerald" end
-   
-   if ( itemType == "Apple" ) then 
-      retItem.iType = "food"
-      retItem.foodValue = 2
-   end
-   
-   
-   if ( retItem.iType == "food" ) then retItem.icon = "%" end
-   if ( retItem.iType == "weapon" ) then retItem.icon = "/" end
-   if ( retItem.iType == "armor" ) then retItem.icon = "]" end
-   if ( retItem.iType == "potion" ) then retItem.icon = "!" end
-   if ( retItem.iType == "emerald" ) then retItem.icon = "$" end
-   if ( retItem.iType == "craft" ) then retItem.icon = "^" end
-   
-   if ( retItem.iType == nil ) then addLog("Bad item: ".. itemType) end
-   if ( retItem.icon == nil ) then addLog("Bad itemtype: " .. retItem.iType) end
-   
-   return retItem
-
-end
-
-function isItemStackable(item)
-   if ( item.name == "Arrows" ) then return true end
-   if ( item.iType == "weapon" or item.iType == "armor" ) then return false end
-   return true
-
-end
 
 -- player actions
 function resolveMovement()   
 end
 
 function playerGet()
-   item = getItemAt(player.x,player.y)
+   item = map.getItemAt(player.x,player.y)
    if ( item == nil ) then
       addLog("Nothing to pick up here.")
       return
    end
-   if ( playerGetItem(item) ) then 
+   if ( player.GetItem(item) ) then 
      addLog("You picked up the " .. item.name)
    else
      addLog("You can't hold any more.")

@@ -1,3 +1,6 @@
+local items = require("mcrawl-items")
+
+
 local map = { 
 	tiles = {},
 	revealmap = {},
@@ -150,7 +153,9 @@ function map.generateMap(player)
       end
       if ( isRoomOK(nRoom) ) then 
          table.insert(map.rooms,nRoom) 
-         totalRooms = totalRooms + 1    
+         totalRooms = totalRooms + 1
+		 local ix, iy = getRandomSpot(nRoom)
+		 addNewFloorItem("Apple",ix,iy)
       end
    end
    
@@ -170,8 +175,22 @@ end
 
 
 
+function map.getItemAt(x,y)
+   for i,item in pairs(map.floorItems) do
+      if ( item.x == x and item.y == y ) then 
+      item.id = i
+      return item 
+     end
+   end
+end
 
 
+function addNewFloorItem(itemType,x,y,quantity)
+   local newItem = items.newItem(itemType,quantity)
+   newItem.x = x
+   newItem.y = y
+   table.insert(map.floorItems,newItem)
+end
 
 
 return map
