@@ -154,8 +154,8 @@ function map.generateMap(player)
       if ( isRoomOK(nRoom) ) then 
          table.insert(map.rooms,nRoom) 
          totalRooms = totalRooms + 1
-		 local ix, iy = getRandomSpot(nRoom)
-		 addNewFloorItem("Apple",ix,iy)
+		 local ix, iy = map.getRandomSpot(nRoom)
+		 map.addNewFloorItem("Apple",ix,iy)
       end
    end
    
@@ -185,7 +185,7 @@ function map.getItemAt(x,y)
 end
 
 
-function addNewFloorItem(itemType,x,y,quantity)
+function map.addNewFloorItem(itemType,x,y,quantity)
    local newItem = items.newItem(itemType,quantity)
    newItem.x = x
    newItem.y = y
