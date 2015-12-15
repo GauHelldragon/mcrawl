@@ -22,36 +22,7 @@ local player = {
    
 }
 
-function player.movePlayer(map,direction)
-   if ( direction == "up"    and player.y > 1  ) then player.tryToMovePlayer(player.x,player.y-1) end
-   if ( direction == "down"  and player.y < map.max_y ) then player.tryToMovePlayer(player.x,player.y+1) end
-   if ( direction == "left"  and player.x > 1  ) then player.tryToMovePlayer(player.x-1,player.y) end
-   if ( direction == "right" and player.x < map.max_x ) then player.tryToMovePlayer(player.x+1,player.y)  end  
-   if ( direction == "nw"    and player.x > 1 and
-                                 player.y > 1 ) then player.tryToMovePlayer(player.x-1,player.y-1) end
-   if ( direction == "ne"    and player.x < map.max_x and
-                                 player.y > 1 ) then player.tryToMovePlayer(player.x+1,player.y-1) end
-   if ( direction == "sw"    and player.x > 1 and
-                                 player.y < map.max_y ) then player.tryToMovePlayer(player.x-1,player.y+1) end
-   if ( direction == "se"    and player.x < map.max_x and
-                                 player.y < map.max_y ) then player.tryToMovePlayer(player.x+1,player.y+1) end
 
-                         
-   
-end
-
-function player.tryToMovePlayer(map,newx,newy)
-   tile = getMapTile(newx,newy)
-
-   if ( tile == "#" ) then return end
-   player.x = newx
-   player.y = newy
-   viewChange = true
-   map.changeReveal(player)
-   moved = true
-   endTurn = true
-   
-end
 
 
 function player.resetPlayer()

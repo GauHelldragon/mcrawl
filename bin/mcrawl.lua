@@ -148,6 +148,36 @@ end
 
 -- PLAYER MOVEMENT
 
+function movePlayer(map,direction)
+   if ( direction == "up"    and player.y > 1  ) then tryToMovePlayer(player.x,player.y-1) end
+   if ( direction == "down"  and player.y < map.max_y ) then tryToMovePlayer(player.x,player.y+1) end
+   if ( direction == "left"  and player.x > 1  ) then tryToMovePlayer(player.x-1,player.y) end
+   if ( direction == "right" and player.x < map.max_x ) then tryToMovePlayer(player.x+1,player.y)  end  
+   if ( direction == "nw"    and player.x > 1 and
+                                 player.y > 1 ) then tryToMovePlayer(player.x-1,player.y-1) end
+   if ( direction == "ne"    and player.x < map.max_x and
+                                 player.y > 1 ) then tryToMovePlayer(player.x+1,player.y-1) end
+   if ( direction == "sw"    and player.x > 1 and
+                                 player.y < map.max_y ) then tryToMovePlayer(player.x-1,player.y+1) end
+   if ( direction == "se"    and player.x < map.max_x and
+                                 player.y < map.max_y ) then tryToMovePlayer(player.x+1,player.y+1) end
+
+                         
+   
+end
+
+function tryToMovePlayer(map,newx,newy)
+   tile = map.tiles[newx][newy]
+
+   if ( tile == "#" ) then return end
+   player.x = newx
+   player.y = newy
+   viewChange = true
+   map.changeReveal(player)
+   moved = true
+   endTurn = true
+   
+end
 
 function isKey(chara,str)
    return ( chara == string.byte(str) or chara == string.byte(string.upper(str)) ) 
@@ -183,14 +213,14 @@ function handleKey(address,chara,code,pname)
 	 return
    end
    
-   if ( isKey(chara,"w") or code == 200 ) then player.movePlayer("up") end
-   if ( isKey(chara,"x") or code == 208 ) then player.movePlayer("down") end
-   if ( isKey(chara,"a") or code == 203 ) then player.movePlayer("left") end
-   if ( isKey(chara,"d") or code == 205 ) then player.movePlayer("right") end
-   if ( isKey(chara,"q") or code == 199 ) then player.movePlayer("nw") end
-   if ( isKey(chara,"e") or code == 201 ) then player.movePlayer("ne") end
-   if ( isKey(chara,"z") or code == 207 ) then player.movePlayer("sw") end
-   if ( isKey(chara,"c") or code == 209 ) then player.movePlayer("se") end
+   if ( isKey(chara,"w") or code == 200 ) then movePlayer("up") end
+   if ( isKey(chara,"x") or code == 208 ) then movePlayer("down") end
+   if ( isKey(chara,"a") or code == 203 ) then movePlayer("left") end
+   if ( isKey(chara,"d") or code == 205 ) then movePlayer("right") end
+   if ( isKey(chara,"q") or code == 199 ) then movePlayer("nw") end
+   if ( isKey(chara,"e") or code == 201 ) then movePlayer("ne") end
+   if ( isKey(chara,"z") or code == 207 ) then movePlayer("sw") end
+   if ( isKey(chara,"c") or code == 209 ) then movePlayer("se") end
    if ( isKey(chara,"g") ) then playerGet() end
    if ( isKey(chara,"i") ) then showInventory() end
 end
