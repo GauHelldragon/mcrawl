@@ -19,4 +19,22 @@ local player = {
    
 }
 
+function player.resetPlayer()
+	player.name = "Steve"
+	player.maxHP = 10
+	player.HP = 10
+	player.level = 1
+	player.xp = 0
+	player.defence = 0
+	player.food = 10
+	player.maxFood = 10
+	player.emeralds = 0
+	
+	player.weapon = nil
+	player.armor = nil
+	
+	player.inventory = {}
+	
+end
+
 return player

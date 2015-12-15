@@ -129,6 +129,8 @@ end
 function map.generateMap(player) 
    map.tiles = {}
    map.revealMap = {}
+   map.rooms = {}
+   map.floorItems = {}
    for x=1,map.max_x do  -- Clear Map
       map.tiles[x] = {}
      map.revealMap[x] = {}
@@ -147,11 +149,9 @@ function map.generateMap(player)
          nRoom = newRoom()
       end
       if ( isRoomOK(nRoom) ) then 
-      table.insert(map.rooms,nRoom) 
-      totalRooms = totalRooms + 1
-     local ix, iy = map.getRandomSpot(nRoom)
-     
-   end
+         table.insert(map.rooms,nRoom) 
+         totalRooms = totalRooms + 1    
+      end
    end
    
    map.max_rooms = totalRooms

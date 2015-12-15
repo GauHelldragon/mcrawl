@@ -344,7 +344,7 @@ end
 
 -- MAIN LOOP
 
-
+player.resetPlayer()
 map.generateMap(player)
 term.clear()
 
