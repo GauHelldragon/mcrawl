@@ -126,7 +126,7 @@ function map.changeReveal(player)
 end
 
 
-function map.generateMap() 
+function map.generateMap(player) 
    map.tiles = {}
    map.revealMap = {}
    for x=1,map.max_x do  -- Clear Map
@@ -140,17 +140,17 @@ function map.generateMap()
    
    local totalRooms = 0
    for i=1,map.max_rooms do
-      local newRoom = newRoom()
+      local nRoom = newRoom()
       local tries = 1
-      while ( not isRoomOK(newRoom) and tries < 10 ) do
+      while ( not isRoomOK(nRoom) and tries < 10 ) do
          tries = tries + 1
-         newRoom = newRoom()
+         nRoom = newRoom()
       end
-      if ( isRoomOK(newRoom) ) then 
-      table.insert(map.rooms,newRoom) 
+      if ( isRoomOK(nRoom) ) then 
+      table.insert(map.rooms,nRoom) 
       totalRooms = totalRooms + 1
-     local ix, iy = map.getRandomSpot(newRoom)
-     addNewFloorItem("Apple",ix,iy)
+     local ix, iy = map.getRandomSpot(nRoom)
+     
    end
    end
    

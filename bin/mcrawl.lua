@@ -41,7 +41,7 @@ function getMapTile(x,y)
    local item = getItemAt(x,y)
    if ( item ~= nil ) then return item.icon end
    
-   return tiles[x][y]
+   return map.tiles[x][y]
 end
 
 
@@ -345,7 +345,7 @@ end
 -- MAIN LOOP
 
 
-map.generateMap()
+map.generateMap(player)
 term.clear()
 
 while ( quit_program == false ) do
