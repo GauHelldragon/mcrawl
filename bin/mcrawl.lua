@@ -199,15 +199,6 @@ function eventHandler(eventID,...)
    if ( eventID == "key_down" ) then handleKey(...) end
 end
 
--- ITEMS
-
-function addNewFloorItem(itemType,x,y,quantity)
-   local newItem = items.newItem(itemType,quantity)
-   newItem.x = x
-   newItem.y = y
-   table.insert(map.floorItems,newItem)
-end
-
 
 -- player actions
 function resolveMovement()   
