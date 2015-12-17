@@ -74,29 +74,38 @@ function drawView()
    --term.write("@")
 
 end
-
+function spaces() term.write("                ") end
 function drawInfo()
    local sx = view_max_x+4
    term.setCursor(sx,1)
    term.write("Player : " .. player.name)
+   spaces()
    term.setCursor(sx,2)
    term.write("Health : " .. player.HP .. "/" .. player.maxHP)
+   spaces()
    term.setCursor(sx,3)
    term.write("Defence : " .. player.defence)
+   spaces()
    term.setCursor(sx,4)
    term.write("Food : " .. math.ceil(player.food) .. "/" .. player.maxFood)
+   spaces()
    term.setCursor(sx,5)
    term.write("Level : " .. player.level)
+   spaces()
    term.setCursor(sx,6)
    term.write("EXP : " .. player.xp ) 
+   spaces()
    term.setCursor(sx,7)
    term.write("Weapon: ")
-   if ( player.weapon == nil ) then term.write("Fists") else term.write(weapon.name) end
+   if ( player.weapon == nil ) then term.write("Fists") else term.write(player.weapon.name) end
+   spaces()
    term.setCursor(sx,8)
    term.write("Armor: ")
-   if ( player.armor == nil ) then term.write("Clothes") else term.write(armor.name) end
+   if ( player.armor == nil ) then term.write("Clothes") else term.write(player.armor.name) end
+   spaces()
    term.setCursor(sx,9)
    term.write("Emeralds: " .. player.emeralds)
+   spaces()
    
    
 end
@@ -147,11 +156,12 @@ function showInventory()
    
    local itemChar = "a"
    for i,item in pairs(player.inventory) do
+	  item.id = i
       if ( i < mry-6 ) then 
          term.setCursor(6, i+5)
          term.write(itemChar .. " : " .. item.name)
          if ( item.quant > 1 ) then term.write(" x".. item.quant) end
-       
+         if ( item == player.weapon or item == player.armor ) then term.write(" (EQ)") end
       end
      itemChar = nextLetter(itemChar)
    end
@@ -268,9 +278,14 @@ function showInvSubMenu(iItem)
       addLog("q : drink")
    end
    if ( iItem.iType == "craft" ) then
-      addLog("c : craft")
+      multiLog(items.getCraftCommands(iItem,player))
+	  --addLog("c : craft")
    end
    
+end
+
+function multiLog(logList)
+	for i,str in pairs(logList) do addLog(str) end
 end
 
 function handleSubInvKey(chara,code)
@@ -293,11 +308,22 @@ function handleSubInvKey(chara,code)
    end
       
    if ( ( selectedItem.iType == "armor" or selectedItem.iType == "weapon" ) and isKey(chara,"e") ) then
-      player.equip(selectedItem)
+      addLog(player.equip(selectedItem))
       return 1
    end
-      
-      
+   
+   if ( selectedItem.iType == "potion" and isKey(chara,"q") ) then
+      addLog(player.drink(selectedItem))
+      return 1
+   end	  
+   if ( selectedItem.iType == "craft" and isKey(chara,"w") and items.canCraftWeapon(selectedItem,player) ) then
+      addLog(player.craftWeapon(selectedItem))
+      return 1
+   end
+   if ( selectedItem.iType == "craft" and isKey(chara,"a") and items.canCraftArmor(selectedItem,player) ) then
+      addLog(player.craftArmor(selectedItem))
+      return 1
+   end     
    -- no valid key pressed, try again dummy
    showingInvSub = true
    return 0

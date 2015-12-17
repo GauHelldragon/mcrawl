@@ -44,6 +44,44 @@ function player.resetPlayer()
    
    
 end
+function player.equip(item)
+	if ( item == nil ) then return "What item?" end
+	local retString = "You equip " .. item.name
+	
+	if ( item == player.weapon ) then 
+		player.weapon = nil
+		return "You unequip " .. item.name
+	end
+	if ( item == player.armor ) then
+		player.armor = nil
+		player.setArmor()
+		return "You unequip " .. item.name
+	end
+	
+	if ( item.iType == "weapon" ) then
+		
+		player.weapon = item
+	else
+		player.armor = item
+		player.setArmor()
+	end
+	
+	return retString
+		
+
+end
+
+function player.drink(item)
+	return "Don't drink and drive"
+end
+
+function player.craftWeapon(item)
+	return "Do what now?"
+end
+
+function player.craftArmor(item)
+	return "What a concept!"
+end
 
 function player.eat(item)
 	if ( player.food >= player.maxFood ) then 

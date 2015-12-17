@@ -156,6 +156,8 @@ function map.generateMap(player)
          totalRooms = totalRooms + 1
 		 local ix, iy = map.getRandomSpot(nRoom)
 		 map.addNewFloorItem("Apple",ix,iy)
+		 ix, iy = map.getRandomSpot(nRoom)
+		 map.addNewFloorItem("Iron",ix,iy)
       end
    end
    

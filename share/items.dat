@@ -105,8 +105,34 @@
       iType = "armor",
       value = 40,
       def = 5,
-      maxDur = 800}
+      maxDur = 800},
       
+   Weak_Potion_of_Healing = {
+      iType = "potion",
+	  value = 2 },
+   Potion_of_Healing = {
+      iType = "potion",
+	  value = 5 },
+   Strong_Potion_of_Healing = {
+      iType = "potion",
+	  value = 10 },
+   Potion_of_Strength = {
+      iType = "potion",
+	  value = 5 },
+   Potion_of_Night_Vision = {
+      iType = "potion",
+	  value = 4 },
+   Potion_of_Fire_Resist = {
+      iType = "potion",
+	  value = 6 },
+   Potion_of_Regen = {
+      iType = "potion",
+	  value = 8 },
+   Milk = {
+	  iType = "potion",
+	  value = 2 }
+	  
+   
    
 
 }

@@ -25,7 +25,7 @@ end
 function item.newItem(itemType,quantity)
    if ( quantity == nil or quantity < 1 ) then quantity = 1 end
    local retItem = {
-      name = itemType,
+      name = string.gsub(itemType,"_"," "),
       quant = quantity
    }
    
@@ -36,13 +36,22 @@ function item.newItem(itemType,quantity)
    
    if ( dbItem == nil ) then addLog("No DBItem for " .. itemType)
    else
-   retItem.iType = dbItem.iType
-   retItem.value = dbItem.value
+     retItem.iType = dbItem.iType
+     retItem.value = dbItem.value
+   end
    
    if ( retItem.iType == "food" ) then
       retItem.foodValue = dbItem.foodValue
    end
-   
+   if ( retItem.iType == "weapon" ) then
+      retItem.damage = dbItem.damage
+      retItem.maxDur = dbItem.maxDur
+	  retItem.dur = retItem.maxDur
+   end
+   if ( retItem.iType == "armor" ) then
+      retItem.def = dbItem.def
+      retItem.maxDur = dbItem.maxDur
+	  retItem.dur = retItem.maxDur
    end
    
    --if ( itemType == "Apple" ) then 
@@ -72,7 +81,23 @@ function item.isItemStackable(item)
 
 end
 
+function item.getCraftCommands(cItem,player)
+	local commands = {}
+	if  item.canCraftWeapon(cItem,player) then table.insert(commands,"w : Craft weapon") end
+	if  item.canCraftArmor(cItem,player) then table.insert(commands,"a : Craft armor") end
+	return commands
+end
 
+function item.canCraftArmor(cItem,player)
+	if ( cItem.name == "Stone" or
+	     cItem.name == "Wood" ) then return false end
+	return true
+end
+
+function item.canCraftWeapon(cItem,player)
+	if ( cItem.name == "Leather" ) then return false end
+	return true
+end
 
 
 return item
