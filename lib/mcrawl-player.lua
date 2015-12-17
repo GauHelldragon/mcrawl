@@ -58,7 +58,7 @@ end
 
 local function nextLetter(itemChar)
    itemChar = string.lower(itemChar)
-   return ('abcdefghijklmnopqrstuvwxyza':match(itemChar..'(.)')
+   return string.match('abcdefghijklmnopqrstuvwxyza',itemChar..'(.)')
 end
 
 function player.getItemFromLetter(letter)

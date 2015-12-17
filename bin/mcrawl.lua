@@ -158,7 +158,7 @@ end
 
 function nextLetter(itemChar)
    itemChar = string.lower(itemChar)
-   return ('abcdefghijklmnopqrstuvwxyza':match(itemChar..'(.)'))
+   return string.match('abcdefghijklmnopqrstuvwxyza',itemChar..'(.)')
 end
 
 -- PLAYER MOVEMENT
