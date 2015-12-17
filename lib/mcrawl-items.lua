@@ -65,7 +65,7 @@ function item.newItem(itemType,quantity)
 
 end
 
-local function isItemStackable(item)
+local item.isItemStackable(item)
    if ( item.name == "Arrows" ) then return true end
    if ( item.iType == "weapon" or item.iType == "armor" ) then return false end
    return true

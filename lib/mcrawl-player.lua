@@ -43,7 +43,7 @@ function player.resetPlayer()
 	
 end
 
-function player.GetItem(item)
+function player.GetItem(map,item)
 
    table.remove(map.floorItems,item.id)
    if ( item.iType == "emerald" ) then 
@@ -51,7 +51,7 @@ function player.GetItem(item)
       return
    end
    
-   if ( isItemStackable(item) ) then
+   if ( items.isItemStackable(item) ) then
       existingItem = items.getPlayerItem(item)
       if ( existingItem ~= nil ) then
         if ( existingItem.quant >= 64 ) then return false end

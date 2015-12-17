@@ -2,9 +2,9 @@ local event = require("event")
 local term = require("term")
 local component = require("component")
 
-local map = dofile("mcrawl-map")
-local player = dofile("mcrawl-player")
-local items = dofile("mcrawl-items")
+local map = dofile("/usr/lib/mcrawl-map.lua")
+local player = dofile("/usr/lib/mcrawl-player.lua")
+local items = dofile("/usr/lib/mcrawl-items.lua")
 
 local gpu = component.gpu
 local mry
@@ -149,7 +149,7 @@ end
 
 -- PLAYER MOVEMENT
 
-function movePlayer(map,direction)
+function movePlayer(direction)
    if ( direction == "up"    and player.y > 1  ) then tryToMovePlayer(player.x,player.y-1) end
    if ( direction == "down"  and player.y < map.max_y ) then tryToMovePlayer(player.x,player.y+1) end
    if ( direction == "left"  and player.x > 1  ) then tryToMovePlayer(player.x-1,player.y) end
@@ -167,7 +167,7 @@ function movePlayer(map,direction)
    
 end
 
-function tryToMovePlayer(map,newx,newy)
+function tryToMovePlayer(newx,newy)
    tile = map.tiles[newx][newy]
 
    if ( tile == "#" ) then return end
@@ -241,7 +241,7 @@ function playerGet()
       addLog("Nothing to pick up here.")
       return
    end
-   if ( player.GetItem(item) ) then 
+   if ( player.GetItem(map,item) ) then 
      addLog("You picked up the " .. item.name)
    else
      addLog("You can't hold any more.")

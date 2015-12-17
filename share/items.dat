@@ -1,5 +1,5 @@
 {
-	"Apple" = {
+	Apple = {
 		iType = "food",
 		value = "0.1",
 		foodValue = "2" }
