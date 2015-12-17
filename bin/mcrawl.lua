@@ -7,7 +7,7 @@ local player = dofile("/usr/lib/mcrawl-player.lua")
 local items = dofile("/usr/lib/mcrawl-items.lua")
 
 local gpu = component.gpu
-local mry,mrx = gpu.maxResolution()
+local mrx,mry = gpu.maxResolution()
 
 local maxItems = 15
 
@@ -139,8 +139,8 @@ function showInventory()
    showingInv = true
    
    drawLargeGui()
-   term.setCursor(math.ceil((mrx/2) - 4), 4)
-   term.write("INVENTORY")
+   term.setCursor(math.ceil((mrx/2) - 8), 4)
+   term.write("INVENTORY - 'q' to return")
    
    local itemChar = "a"
    for i,item in pairs(player.inventory) do
@@ -217,7 +217,7 @@ function handleKey(address,chara,code,pname)
       addLog(player.name .. " has entered the dungeon!")
       infoChange = true
    end     
-   if ( isKey(chara,"1") ) then quit_program = true end
+   
    
    if ( showingInv ) then 
      handleInventoryKey(chara,code)
@@ -228,14 +228,16 @@ function handleKey(address,chara,code,pname)
     return
    end
    
-   if ( isKey(chara,"w") or code == 200 ) then movePlayer("up") end
-   if ( isKey(chara,"x") or code == 208 ) then movePlayer("down") end
-   if ( isKey(chara,"a") or code == 203 ) then movePlayer("left") end
-   if ( isKey(chara,"d") or code == 205 ) then movePlayer("right") end
-   if ( isKey(chara,"q") or code == 199 ) then movePlayer("nw") end
-   if ( isKey(chara,"e") or code == 201 ) then movePlayer("ne") end
-   if ( isKey(chara,"z") or code == 207 ) then movePlayer("sw") end
-   if ( isKey(chara,"c") or code == 209 ) then movePlayer("se") end
+   if ( isKey(chara,"q") ) then quit_program = true return end
+   
+   if (  code == 200 ) then movePlayer("up") end
+   if (  code == 208 ) then movePlayer("down") end
+   if (  code == 203 ) then movePlayer("left") end
+   if (  code == 205 ) then movePlayer("right") end
+   if (  code == 199 ) then movePlayer("nw") end
+   if (  code == 201 ) then movePlayer("ne") end
+   if (  code == 207 ) then movePlayer("sw") end
+   if (  code == 209 ) then movePlayer("se") end
    if ( isKey(chara,"g") ) then playerGet() end
    if ( isKey(chara,"i") ) then showInventory() end
 end
@@ -243,10 +245,10 @@ end
 local selectedItem
 
 function showInvSubMenu(iItem)
-    if ( iItem ~= nil ) then addLog("Bad item in showInvSubMenu") return end
+    if ( iItem == nil ) then addLog("Bad item in showInvSubMenu") return end
    selectedItem = iItem
    showingInvSub = true
-   addLog("Do what with the .. " iItem.name .. "?")
+   addLog("Do what with the " .. iItem.name .. "?")
    addLog("q : nothing")
    addLog("d : drop")
    if ( iItem.iType == "food" ) then
@@ -270,7 +272,7 @@ end
 
 function handleSubInvKey(chara,code)
    showingInvSub = false
-   if ( isKey(chara,"q") or selectedItem ~= nil ) then
+   if ( isKey(chara,"q") or selectedItem == nil ) then
       
       addLog("Ok.")
       return 1
@@ -365,6 +367,10 @@ items.loadAllItems()
 player.resetPlayer()
 map.generateMap(player)
 term.clear()
+
+addLog("Press Q to quit")
+addLog("Press I for inventory")
+addLog("Press G to get item")
 
 while ( quit_program == false ) do
    drawScreen()

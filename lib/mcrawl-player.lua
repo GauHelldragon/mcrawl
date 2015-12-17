@@ -58,13 +58,14 @@ end
 
 local function nextLetter(itemChar)
    itemChar = string.lower(itemChar)
-   return string.match('abcdefghijklmnopqrstuvwxyza',itemChar..'(.)')
+   return string.match('abcdefghijklmnopqrstuvwxyza',itemChar..'(.)')*
 end
 
-function player.getItemFromLetter(letter)
+function player.getItemFromLetter(chara)
+   local letter = string.lower( string.char(chara) )
    local cLetter = "a"
-   for i,cItem in player.inventory do 
-      if ( cLetter == letter ) then return cItem
+   for i,cItem in pairs(player.inventory) do 
+      if ( cLetter == letter ) then return cItem end
       cLetter = nextLetter(cLetter)
    end
    
