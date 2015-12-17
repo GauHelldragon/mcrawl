@@ -138,8 +138,11 @@ end
 function showInventory()
    showingInv = true
    
+   infoChange = false
+   logChange = false
+   
    drawLargeGui()
-   term.setCursor(math.ceil((mrx/2) - 8), 4)
+   term.setCursor(math.ceil((mrx/2) - 12), 4)
    term.write("INVENTORY - 'q' to return")
    
    local itemChar = "a"
