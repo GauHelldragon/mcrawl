@@ -1,9 +1,10 @@
 local event = require("event")
 local term = require("term")
 local component = require("component")
-local map = require("mcrawl-map")
-local player = require("mcrawl-player")
-local items = require("mcrawl-items")
+
+local map = dofile("mcrawl-map")
+local player = dofile("mcrawl-player")
+local items = dofile("mcrawl-items")
 
 local gpu = component.gpu
 local mry
@@ -253,6 +254,7 @@ end
 
 -- MAIN LOOP
 
+items.loadAllItems()
 player.resetPlayer()
 map.generateMap(player)
 term.clear()
