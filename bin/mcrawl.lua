@@ -148,17 +148,17 @@ function showInventory()
          term.setCursor(6, i+5)
          term.write(itemChar .. " : " .. item.name)
          if ( item.quant > 1 ) then term.write(" x".. item.quant) end
-		 
+       
       end
-	  itemChar = nextLetter(itemChar)
+     itemChar = nextLetter(itemChar)
    end
    
    
 end
 
 function nextLetter(itemChar)
-	itemChar = string.lower(itemChar)
-	return 'abcdefghijklmnopqrstuvwxyza':match(itemChar..'(.)')
+   itemChar = string.lower(itemChar)
+   return ('abcdefghijklmnopqrstuvwxyza':match(itemChar..'(.)'))
 end
 
 -- PLAYER MOVEMENT
@@ -224,8 +224,8 @@ function handleKey(address,chara,code,pname)
      return
    end
    if ( showingInvSub ) then
-	 if ( handleSubInvKey(chara,code) ) then infoChange = true end
-	 return
+    if ( handleSubInvKey(chara,code) ) then infoChange = true end
+    return
    end
    
    if ( isKey(chara,"w") or code == 200 ) then movePlayer("up") end
@@ -244,58 +244,58 @@ local selectedItem
 
 function showInvSubMenu(iItem)
     if ( iItem ~= nil ) then addLog("Bad item in showInvSubMenu") return end
-	selectedItem = iItem
-	showingInvSub = true
-	addLog("Do what with the .. " iItem.name .. "?")
-	addLog("q : nothing")
-	addLog("d : drop")
-	if ( iItem.iType == "food" ) then
-		addLog("e : eat")
-	end
-	if ( iItem.iType == "weapon" or iItem.iType == "armor" ) then
-		if ( player.weapon == iItem or player.armor == iItem ) then
-			addLog("e : unequip")
-		else
-			addLog("e : equip")
-		end
-	end
-	if ( iItem.iType == "potion" ) then
-		addLog("q : drink")
-	end
-	if ( iItem.iType == "craft" ) then
-		addLog("c : craft")
-	end
-	
+   selectedItem = iItem
+   showingInvSub = true
+   addLog("Do what with the .. " iItem.name .. "?")
+   addLog("q : nothing")
+   addLog("d : drop")
+   if ( iItem.iType == "food" ) then
+      addLog("e : eat")
+   end
+   if ( iItem.iType == "weapon" or iItem.iType == "armor" ) then
+      if ( player.weapon == iItem or player.armor == iItem ) then
+         addLog("e : unequip")
+      else
+         addLog("e : equip")
+      end
+   end
+   if ( iItem.iType == "potion" ) then
+      addLog("q : drink")
+   end
+   if ( iItem.iType == "craft" ) then
+      addLog("c : craft")
+   end
+   
 end
 
 function handleSubInvKey(chara,code)
-	showingInvSub = false
-	if ( isKey(chara,"q") or selectedItem ~= nil ) then
-		
-		addLog("Ok.")
-		return 1
-	end
-		
-	if ( isKey(chara,"d") ) then
-		addLog("You drop the " .. selectedItem.name)
-		player.playerDropItem(selectedItem,map)
-		return 1
-	end
-	
-	if ( selectedItem.iType == "food" and isKey(chara,"e") ) then
-		player.eat(selectedItem)
-		return 1
-	end
-		
-	if ( ( selectedItem.iType == "armor" or selectedItem.iType == "weapon" ) and isKey(chara,"e") ) then
-		player.equip(selectedItem)
-		return 1
-	end
-		
-		
-	-- no valid key pressed, try again dummy
-	showingInvSub = true
-	return 0
+   showingInvSub = false
+   if ( isKey(chara,"q") or selectedItem ~= nil ) then
+      
+      addLog("Ok.")
+      return 1
+   end
+      
+   if ( isKey(chara,"d") ) then
+      addLog("You drop the " .. selectedItem.name)
+      player.playerDropItem(selectedItem,map)
+      return 1
+   end
+   
+   if ( selectedItem.iType == "food" and isKey(chara,"e") ) then
+      player.eat(selectedItem)
+      return 1
+   end
+      
+   if ( ( selectedItem.iType == "armor" or selectedItem.iType == "weapon" ) and isKey(chara,"e") ) then
+      player.equip(selectedItem)
+      return 1
+   end
+      
+      
+   -- no valid key pressed, try again dummy
+   showingInvSub = true
+   return 0
 end
 
 function handleInventoryKey(chara,code)
@@ -305,8 +305,8 @@ function handleInventoryKey(chara,code)
      logChange = true
      infoChange = true
      term.clear()
-	 
-	 return
+    
+    return
    end
    
    
@@ -314,14 +314,14 @@ function handleInventoryKey(chara,code)
    
    local iItem = player.getItemFromLetter(chara)
    if ( iItem ~= nil ) then
-	 showingInv = false
+    showingInv = false
      viewChange = true
      logChange = true
      infoChange = true
      term.clear()
-	 
-	 showInvSubMenu(iItem)
-	 return
+    
+    showInvSubMenu(iItem)
+    return
    end
    
    

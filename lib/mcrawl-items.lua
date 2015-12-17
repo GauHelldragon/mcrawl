@@ -1,25 +1,25 @@
 local item = {
-	itemList = {}
-	
+   itemList = {}
+   
 }
 
 function item.loadAllItems()
 
-	local file, reason = io.open("/usr/share/items.dat", "r")
-	if not file then
-	  io.stderr:write("Failed opening items.dat file: " .. reason .. "\n")
-	  os.exit(1)
-	end
-	
-	local rawdata = file:read("*all")
-	file:close()
-	
-	local data, reason = load("return " .. rawdata)
-	if not data then
-	  io.stderr:write("Failed loading items data: " .. reason .. "\n")
-	  os.exit(2)
-	end
-	itemList = data()
+   local file, reason = io.open("/usr/share/items.dat", "r")
+   if not file then
+     io.stderr:write("Failed opening items.dat file: " .. reason .. "\n")
+     os.exit(1)
+   end
+   
+   local rawdata = file:read("*all")
+   file:close()
+   
+   local data, reason = load("return " .. rawdata)
+   if not data then
+     io.stderr:write("Failed loading items data: " .. reason .. "\n")
+     os.exit(2)
+   end
+   itemList = data()
 end
 
 function item.newItem(itemType,quantity)
@@ -36,12 +36,12 @@ function item.newItem(itemType,quantity)
    
    if ( dbItem == nil ) then addLog("No DBItem for " .. itemType)
    else
-	retItem.iType = dbItem.iType
-	retItem.value = dbItem.value
-	
-	if ( retItem.iType == "food" ) then
-		retItem.foodValue = dbItem.foodValue
-	end
+   retItem.iType = dbItem.iType
+   retItem.value = dbItem.value
+   
+   if ( retItem.iType == "food" ) then
+      retItem.foodValue = dbItem.foodValue
+   end
    
    end
    

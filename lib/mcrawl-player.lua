@@ -27,22 +27,22 @@ local player = {
 
 
 function player.resetPlayer()
-	player.name = "Steve"
-	player.maxHP = 10
-	player.HP = 10
-	player.level = 1
-	player.xp = 0
-	player.defence = 0
-	player.food = 10
-	player.maxFood = 10
-	player.emeralds = 0
-	
-	player.weapon = nil
-	player.armor = nil
-	
-	player.inventory = {}
-	
-	
+   player.name = "Steve"
+   player.maxHP = 10
+   player.HP = 10
+   player.level = 1
+   player.xp = 0
+   player.defence = 0
+   player.food = 10
+   player.maxFood = 10
+   player.emeralds = 0
+   
+   player.weapon = nil
+   player.armor = nil
+   
+   player.inventory = {}
+   
+   
 end
 
 
@@ -57,26 +57,26 @@ local function getPlayerItem(player,item)
 end
 
 local function nextLetter(itemChar)
-	itemChar = string.lower(itemChar)
-	return ('abcdefghijklmnopqrstuvwxyza':match(itemChar..'(.)')
+   itemChar = string.lower(itemChar)
+   return ('abcdefghijklmnopqrstuvwxyza':match(itemChar..'(.)')
 end
 
 function player.getItemFromLetter(letter)
-	local cLetter = "a"
-	for i,cItem in player.inventory do 
-		if ( cLetter == letter ) then return cItem
-		cLetter = nextLetter(cLetter)
-	end
-	
+   local cLetter = "a"
+   for i,cItem in player.inventory do 
+      if ( cLetter == letter ) then return cItem
+      cLetter = nextLetter(cLetter)
+   end
+   
 end
 
 
 function player.getInventorySize()
-	local count = 0
-	for i,item in pairs(player.inventory) do
-		count = count + 1
-	end
-	return count
+   local count = 0
+   for i,item in pairs(player.inventory) do
+      count = count + 1
+   end
+   return count
 end
 
 
@@ -102,11 +102,11 @@ end
 
 
 function player.setArmor()
-	if ( player.armor ~= nil ) then 
-		player.defence = player.armor.def
-	else
-		player.defence = 0
-	end
+   if ( player.armor ~= nil ) then 
+      player.defence = player.armor.def
+   else
+      player.defence = 0
+   end
 
 end
 
