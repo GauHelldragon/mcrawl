@@ -19,6 +19,7 @@ local player = {
    armor = nil,
    
    inventory = {}
+
    
 }
 
@@ -41,6 +42,7 @@ function player.resetPlayer()
 	
 	player.inventory = {}
 	
+	
 end
 
 
@@ -52,6 +54,29 @@ local function getPlayerItem(player,item)
          return sitem
       end
    end
+end
+
+local function nextLetter(itemChar)
+	itemChar = string.lower(itemChar)
+	return ('abcdefghijklmnopqrstuvwxyza':match(itemChar..'(.)')
+end
+
+function player.getItemFromLetter(letter)
+	local cLetter = "a"
+	for i,cItem in player.inventory do 
+		if ( cLetter == letter ) then return cItem
+		cLetter = nextLetter(cLetter)
+	end
+	
+end
+
+
+function player.getInventorySize()
+	local count = 0
+	for i,item in pairs(player.inventory) do
+		count = count + 1
+	end
+	return count
 end
 
 
@@ -76,7 +101,14 @@ function player.GetItem(map,item)
 end
 
 
+function player.setArmor()
+	if ( player.armor ~= nil ) then 
+		player.defence = player.armor.def
+	else
+		player.defence = 0
+	end
 
+end
 
 function player.playerDropItem(item,map)
    table.remove(player.inventory,item.id)
@@ -84,7 +116,7 @@ function player.playerDropItem(item,map)
    item.y = player.y
    table.insert(map.floorItems,item)
    if ( player.weapon == item ) then player.weapon = nil end
-   if ( player.armor == item ) then player.armor = nil end
+   if ( player.armor == item ) then player.armor = nil player.setArmor() end
 end
 
 

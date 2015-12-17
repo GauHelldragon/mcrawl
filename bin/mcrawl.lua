@@ -7,9 +7,10 @@ local player = dofile("/usr/lib/mcrawl-player.lua")
 local items = dofile("/usr/lib/mcrawl-items.lua")
 
 local gpu = component.gpu
-local mry
-local mrx
-mrx, mry = gpu.maxResolution()
+local mry,mrx = gpu.maxResolution()
+
+local maxItems = 15
+
 gpu.setResolution(mrx,mry)
 if ( mrx > 40 ) then mrx = 40 end
 if ( mry > 20 ) then mry = 20 end
@@ -119,10 +120,9 @@ function drawScreen()
 end
 
 local showingInv = false
+local showingInvSub = false
 
-function showInventory()
-   showingInv = true
-   
+function drawLargeGui()
    top = string.rep("=",mrx-6)
    mid = "|" .. string.rep(" ",mrx-8) .. "|"
    term.setCursor(3,3)
@@ -133,18 +133,32 @@ function showInventory()
       term.setCursor(3,y)
       term.write(mid)
    end
+end
+
+function showInventory()
+   showingInv = true
+   
+   drawLargeGui()
    term.setCursor(math.ceil((mrx/2) - 4), 4)
    term.write("INVENTORY")
+   
+   local itemChar = "a"
    for i,item in pairs(player.inventory) do
       if ( i < mry-6 ) then 
          term.setCursor(6, i+5)
-         term.write(item.name)
+         term.write(itemChar .. " : " .. item.name)
          if ( item.quant > 1 ) then term.write(" x".. item.quant) end
+		 
       end
-   
+	  itemChar = nextLetter(itemChar)
    end
    
    
+end
+
+function nextLetter(itemChar)
+	itemChar = string.lower(itemChar)
+	return 'abcdefghijklmnopqrstuvwxyza':match(itemChar..'(.)')
 end
 
 -- PLAYER MOVEMENT
@@ -206,11 +220,11 @@ function handleKey(address,chara,code,pname)
    if ( isKey(chara,"1") ) then quit_program = true end
    
    if ( showingInv ) then 
-     showingInv = false
-     viewChange = true
-     logChange = true
-     infoChange = true
-     term.clear()
+     handleInventoryKey(chara,code)
+     return
+   end
+   if ( showingInvSub ) then
+	 if ( handleSubInvKey(chara,code) ) then infoChange = true end
 	 return
    end
    
@@ -225,6 +239,94 @@ function handleKey(address,chara,code,pname)
    if ( isKey(chara,"g") ) then playerGet() end
    if ( isKey(chara,"i") ) then showInventory() end
 end
+
+local selectedItem
+
+function showInvSubMenu(iItem)
+    if ( iItem ~= nil ) then addLog("Bad item in showInvSubMenu") return end
+	selectedItem = iItem
+	showingInvSub = true
+	addLog("Do what with the .. " iItem.name .. "?")
+	addLog("q : nothing")
+	addLog("d : drop")
+	if ( iItem.iType == "food" ) then
+		addLog("e : eat")
+	end
+	if ( iItem.iType == "weapon" or iItem.iType == "armor" ) then
+		if ( player.weapon == iItem or player.armor == iItem ) then
+			addLog("e : unequip")
+		else
+			addLog("e : equip")
+		end
+	end
+	if ( iItem.iType == "potion" ) then
+		addLog("q : drink")
+	end
+	if ( iItem.iType == "craft" ) then
+		addLog("c : craft")
+	end
+	
+end
+
+function handleSubInvKey(chara,code)
+	showingInvSub = false
+	if ( isKey(chara,"q") or selectedItem ~= nil ) then
+		
+		addLog("Ok.")
+		return 1
+	end
+		
+	if ( isKey(chara,"d") ) then
+		addLog("You drop the " .. selectedItem.name)
+		player.playerDropItem(selectedItem,map)
+		return 1
+	end
+	
+	if ( selectedItem.iType == "food" and isKey(chara,"e") ) then
+		player.eat(selectedItem)
+		return 1
+	end
+		
+	if ( ( selectedItem.iType == "armor" or selectedItem.iType == "weapon" ) and isKey(chara,"e") ) then
+		player.equip(selectedItem)
+		return 1
+	end
+		
+		
+	-- no valid key pressed, try again dummy
+	showingInvSub = true
+	return 0
+end
+
+function handleInventoryKey(chara,code)
+   if ( isKey(chara,"q") ) then 
+     showingInv = false
+     viewChange = true
+     logChange = true
+     infoChange = true
+     term.clear()
+	 
+	 return
+   end
+   
+   
+   
+   
+   local iItem = player.getItemFromLetter(chara)
+   if ( iItem ~= nil ) then
+	 showingInv = false
+     viewChange = true
+     logChange = true
+     infoChange = true
+     term.clear()
+	 
+	 showInvSubMenu(iItem)
+	 return
+   end
+   
+   
+end
+
 
 function eventHandler(eventID,...)
    if ( eventID == "key_down" ) then handleKey(...) end
@@ -241,10 +343,15 @@ function playerGet()
       addLog("Nothing to pick up here.")
       return
    end
+   
+   if ( player.getInventorySize() >= maxItems ) then
+      addLog("Your inventory is full.")
+      return
+   end
    if ( player.GetItem(map,item) ) then 
-     addLog("You picked up the " .. item.name)
+      addLog("You picked up the " .. item.name)
    else
-     addLog("You can't hold any more.")
+      addLog("You can't hold any more.")
    end
 end
 
