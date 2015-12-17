@@ -288,7 +288,7 @@ function handleSubInvKey(chara,code)
    end
    
    if ( selectedItem.iType == "food" and isKey(chara,"e") ) then
-      player.eat(selectedItem)
+      addLog(player.eat(selectedItem))
       return 1
    end
       

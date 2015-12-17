@@ -45,6 +45,23 @@ function player.resetPlayer()
    
 end
 
+function player.eat(item)
+	if ( player.food >= player.maxFood ) then 
+		return "You are too full to eat " .. item.name
+	end
+	local retString = "You eat the " .. item.name
+	player.food = math.min(player.food + item.foodvalue,player.maxFood)
+	
+	
+	item.quant = item.quant - 1
+	
+	if ( item.quant <= 0 ) then
+		table.remove(player.inventory,item.id)
+	end
+	
+	return retString
+end
+
 
 local function getPlayerItem(player,item)
    for i,sitem in pairs(player.inventory) do
