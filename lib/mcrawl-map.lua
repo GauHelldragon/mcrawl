@@ -1,4 +1,4 @@
-local items = require("mcrawl-items")
+local items = dofile("/usr/lib/mcrawl-items.lua")
 
 
 local map = { 
