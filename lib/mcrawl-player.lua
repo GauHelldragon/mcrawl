@@ -43,6 +43,18 @@ function player.resetPlayer()
 	
 end
 
+
+local function getPlayerItem(player,item)
+   for i,sitem in pairs(player.inventory) do
+      
+      if ( item.name == sitem.name ) then
+         sitem.id = i
+         return sitem
+      end
+   end
+end
+
+
 function player.GetItem(map,item)
 
    table.remove(map.floorItems,item.id)
@@ -52,7 +64,7 @@ function player.GetItem(map,item)
    end
    
    if ( items.isItemStackable(item) ) then
-      existingItem = items.getPlayerItem(item)
+      existingItem = getPlayerItem(player,item)
       if ( existingItem ~= nil ) then
         if ( existingItem.quant >= 64 ) then return false end
         existingItem.quant = math.min(existingItem.quant + item.quant,64)
@@ -63,15 +75,6 @@ function player.GetItem(map,item)
    return true
 end
 
-local function getPlayerItem(item)
-   for i,sitem in pairs(player.inventory) do
-      
-      if ( item.name == sitem.name ) then
-         sitem.id = i
-         return sitem
-      end
-   end
-end
 
 
 
