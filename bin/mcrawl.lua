@@ -380,7 +380,16 @@ function playerGet()
       return
    end
    if ( player.GetItem(map,item) ) then 
-      addLog("You picked up the " .. item.name)
+      infoChange = true
+      if ( item.quant ~= 1 ) then
+	    if ( item.quant ~= math.floor(item.quant) ) then
+		    addLog("You picked up " .. item.quant * 10 .. " " .. item.name .. " shards")
+		else
+			addLog("You picked up " .. item.quant .. " " .. item.name)
+		end
+	  else
+		addLog("You picked up the " .. item.name)
+	  end
    else
       addLog("You can't hold any more.")
    end

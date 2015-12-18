@@ -1,4 +1,9 @@
 {
+   Emerald = {
+	  iType = "emerald",
+	  value = 1 },
+   
+   
    Apple = {
       iType = "food",
       value = 0.1,

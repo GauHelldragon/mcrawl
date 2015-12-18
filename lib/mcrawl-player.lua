@@ -140,8 +140,8 @@ function player.GetItem(map,item)
 
    table.remove(map.floorItems,item.id)
    if ( item.iType == "emerald" ) then 
-      player.emeralds = player.emeralds + item.quantity
-      return
+      player.emeralds = player.emeralds + item.quant
+      return true
    end
    
    if ( items.isItemStackable(item) ) then

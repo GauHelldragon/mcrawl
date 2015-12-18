@@ -23,7 +23,7 @@ function item.loadAllItems()
 end
 
 function item.newItem(itemType,quantity)
-   if ( quantity == nil or quantity < 1 ) then quantity = 1 end
+   if ( quantity == nil or quantity <= 0 ) then quantity = 1 end
    local retItem = {
       name = string.gsub(itemType,"_"," "),
       quant = quantity

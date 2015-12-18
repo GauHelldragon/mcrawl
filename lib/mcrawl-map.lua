@@ -1,5 +1,5 @@
 local items = dofile("/usr/lib/mcrawl-items.lua")
-
+local treasure = dofile("/usr/lib/mcrawl-treasure.lua")
 
 local map = { 
 	tiles = {},
@@ -9,7 +9,8 @@ local map = {
 	max_y = 50,
 	max_rooms = 10,
 	rooms = {},
-	floorItems = {}
+	floorItems = {},
+	treasureLevel = 1
 	
 }
 
@@ -154,10 +155,7 @@ function map.generateMap(player)
       if ( isRoomOK(nRoom) ) then 
          table.insert(map.rooms,nRoom) 
          totalRooms = totalRooms + 1
-		 local ix, iy = map.getRandomSpot(nRoom)
-		 map.addNewFloorItem("Apple",ix,iy)
-		 ix, iy = map.getRandomSpot(nRoom)
-		 map.addNewFloorItem("Iron",ix,iy)
+		 treasure.addRoomLoot(map,nRoom,map.treasureLevel)
       end
    end
    
@@ -186,13 +184,6 @@ function map.getItemAt(x,y)
    end
 end
 
-
-function map.addNewFloorItem(itemType,x,y,quantity)
-   local newItem = items.newItem(itemType,quantity)
-   newItem.x = x
-   newItem.y = y
-   table.insert(map.floorItems,newItem)
-end
 
 
 return map
