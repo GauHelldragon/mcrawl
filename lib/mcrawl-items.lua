@@ -24,6 +24,8 @@ end
 
 function item.newItem(itemType,quantity)
    if ( quantity == nil or quantity <= 0 ) then quantity = 1 end
+   if ( itemType == nil ) then print("newItem with no itemType!" ) os.exit(1) end
+   
    local retItem = {
       name = string.gsub(itemType,"_"," "),
       quant = quantity
@@ -53,7 +55,11 @@ function item.newItem(itemType,quantity)
       retItem.maxDur = dbItem.maxDur
 	  retItem.dur = retItem.maxDur
    end
+   if ( retItem.iType == "craft" ) then
+	retItem.weaponCraft = dbItem.weaponCraft
+	retItem.armorCraft = dbItem.armorCraft
    
+   end
    --if ( itemType == "Apple" ) then 
    --   retItem.iType = "food"
    --   retItem.foodValue = 2
@@ -98,6 +104,13 @@ function item.canCraftWeapon(cItem,player)
 	if ( cItem.name == "Leather" ) then return false end
 	return true
 end
-
+function item.getCraftedWeapon(cItem)
+	local newType = cItem.weaponCraft
+	return item.newItem(newType)
+end
+function item.getCraftedArmor(cItem)
+	local newType = cItem.armorCraft
+	return item.newItem(newType)
+end
 
 return item

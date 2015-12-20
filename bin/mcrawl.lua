@@ -1,10 +1,13 @@
 local event = require("event")
 local term = require("term")
 local component = require("component")
+local unicode = require("unicode")
 
 local map = dofile("/usr/lib/mcrawl-map.lua")
 local player = dofile("/usr/lib/mcrawl-player.lua")
 local items = dofile("/usr/lib/mcrawl-items.lua")
+
+
 
 local gpu = component.gpu
 local mrx,mry = gpu.maxResolution()
@@ -37,12 +40,19 @@ local endTurn = false
 
 function getMapTile(x,y)
    
-   if ( x == player.x and y == player.y ) then return "@" end
+   if ( x == player.x and y == player.y ) then return unicode.char(9786) end
    
-   if ( map.revealMap[x][y] == 0 ) then return "*" end
-   
+   if ( map.revealMap[x][y] == 0 ) then return unicode.char(9617) end
+ 
+   local chest = map.getChestAt(x,y)
+   if ( chest ~= nil ) then return unicode.char(9054) end
+  
+ 
    local item = map.getItemAt(x,y)
    if ( item ~= nil ) then return item.icon end
+   
+ 
+   if ( map.tiles[x][y] == "#" ) then return unicode.char(9608) end
    
    return map.tiles[x][y]
 end
@@ -75,6 +85,9 @@ function drawView()
 
 end
 function spaces() term.write("                ") end
+function getEquipDisplayString(item)
+	return item.name .. " " .. math.floor( 100 * item.dur / item.maxDur ) .. "%" 
+end
 function drawInfo()
    local sx = view_max_x+4
    term.setCursor(sx,1)
@@ -97,11 +110,11 @@ function drawInfo()
    spaces()
    term.setCursor(sx,7)
    term.write("Weapon: ")
-   if ( player.weapon == nil ) then term.write("Fists") else term.write(player.weapon.name) end
+   if ( player.weapon == nil ) then term.write("Fists") else term.write(getEquipDisplayString(player.weapon)) end
    spaces()
    term.setCursor(sx,8)
    term.write("Armor: ")
-   if ( player.armor == nil ) then term.write("Clothes") else term.write(player.armor.name) end
+   if ( player.armor == nil ) then term.write("Clothes") else term.write(getEquipDisplayString(player.armor)) end
    spaces()
    term.setCursor(sx,9)
    term.write("Emeralds: " .. player.emeralds)
@@ -109,6 +122,7 @@ function drawInfo()
    
    
 end
+
 
 function drawLog()
    local logI = 0
@@ -132,12 +146,13 @@ local showingInv = false
 local showingInvSub = false
 
 function drawLargeGui()
-   top = string.rep("=",mrx-6)
-   mid = "|" .. string.rep(" ",mrx-8) .. "|"
+   top = unicode.char(9484) .. string.rep(unicode.char(9472),mrx-8) .. unicode.char(9488)
+   bot = unicode.char(9492) .. string.rep(unicode.char(9472),mrx-8) .. unicode.char(9496)
+   mid = unicode.char(9474) .. string.rep(" ",mrx-8) .. unicode.char(9474)
    term.setCursor(3,3)
    term.write(top)
    term.setCursor(3,mry-3)
-   term.write(top)
+   term.write(bot)
    for y=4,mry-4 do
       term.setCursor(3,y)
       term.write(mid)
@@ -159,7 +174,11 @@ function showInventory()
 	  item.id = i
       if ( i < mry-6 ) then 
          term.setCursor(6, i+5)
-         term.write(itemChar .. " : " .. item.name)
+         if ( item.dur ~= nil and item.maxDur ~= nil ) then
+			term.write(itemChar .. " : " .. getEquipDisplayString(item))
+		 else
+			term.write(itemChar .. " : " .. item.name)
+		 end
          if ( item.quant > 1 ) then term.write(" x".. item.quant) end
          if ( item == player.weapon or item == player.armor ) then term.write(" (EQ)") end
       end
@@ -195,14 +214,24 @@ function movePlayer(direction)
 end
 
 function tryToMovePlayer(newx,newy)
-   tile = map.tiles[newx][newy]
-
+   
+   
+   
+   local tile = map.tiles[newx][newy]
+  
    if ( tile == "#" ) then return end
-   player.x = newx
-   player.y = newy
+   local chest = map.getChestAt(newx,newy)
+   if ( chest ~= nil ) then
+     map.openChest(chest)
+	 addLog("You open the treasure chest.")
+   else
+	player.x = newx
+ 	player.y = newy
+	moved = true
+   end
    viewChange = true
    map.changeReveal(player)
-   moved = true
+   
    endTurn = true
    
 end
@@ -390,13 +419,27 @@ function playerGet()
 	  else
 		addLog("You picked up the " .. item.name)
 	  end
+	  endTurn = true
    else
       addLog("You can't hold any more.")
    end
 end
 
--- Monsters?
+
 function resolveTurn()
+	player.runHeartBeat() -- hunger, regen, status effects
+	
+	infoChange = true
+	
+	-- monster AI here
+
+end
+
+function checkForDeath()
+	if ( player.HP <= 0 ) then 
+		addLog(player.name .. " " .. player.deathMessage)
+		quit_program = true
+	end
 end
 
 -- MAIN LOOP
@@ -420,5 +463,5 @@ while ( quit_program == false ) do
    eventHandler(event.pull())
    if ( moved == true ) then resolveMovement() end
    if ( endTurn == true ) then resolveTurn() end
-   
+   checkForDeath()
 end

@@ -77,7 +77,33 @@ local function getRandomRoomLoot(lootLevel)
 	return getLootItem(lootList)
 end	
 	
+local function getGoodChestItem(tL)
+	local lootList = lootTable.chest[tL]
+	return getLootItem(lootList)
+end
 
+local function getWornEquipment(lootList)
+	local loot = getWeightedLoot( lootList )
+	local item = items.newItem(loot.iType,1)
+	if ( loot.dur < 1 ) then
+		
+		item.dur = math.floor(item.maxDur * loot.dur)
+		item.dur = item.dur + math.random(-10,10)
+		item.dur = math.max(1,item.dur)
+		item.dur = math.min(item.maxDur, item.dur)
+	end
+	return item
+end
+
+local function getRandomWeapon(tL)
+	local lootList = lootTable.weapon[tL]
+	return getWornEquipment(lootList)
+end
+
+local function getRandomArmor(tL)
+	local lootList = lootTable.armor[tL]
+	return getWornEquipment(lootList)
+end
 	
 	
 
@@ -102,6 +128,37 @@ end
 
 
 
+local function newChest(treasureLevel)
+	local newChest = {
+		contents = {}
+	}
+	
+	local greatItem
+	if ( math.random() < 0.33 ) then greatItem = getRandomArmor(treasureLevel)
+	else greatItem = getRandomWeapon(treasureLevel) end
+	
+	table.insert(newChest.contents, greatItem)
+	local goodItems = math.random(1,3)
+	for i = 1,goodItems do
+		table.insert(newChest.contents, getGoodChestItem(treasureLevel) )
+	end
 
+	local okItems = math.random(3,5)
+	for i = 1,okItems do
+		table.insert(newChest.contents, getRandomRoomLoot(treasureLevel) )
+	end
+	
+	return newChest
+end
+
+function treasure.addRoomChest(map,room,treasureLevel)
+	local newChest = newChest(treasureLevel)
+
+	local cX, cY = getRandomSpot(room)
+	newChest.x = cX
+	newChest.y = cY
+	table.insert(map.chests,newChest)
+	
+end
 
 return treasure

@@ -1,5 +1,7 @@
 local items = dofile("/usr/lib/mcrawl-items.lua")
 local treasure = dofile("/usr/lib/mcrawl-treasure.lua")
+local unicode = require("unicode")
+
 
 local map = { 
 	tiles = {},
@@ -10,7 +12,8 @@ local map = {
 	max_rooms = 10,
 	rooms = {},
 	floorItems = {},
-	treasureLevel = 1
+	treasureLevel = 1,
+	chests = {}
 	
 }
 
@@ -135,6 +138,7 @@ function map.generateMap(player)
    map.revealMap = {}
    map.rooms = {}
    map.floorItems = {}
+   map.chests = {}
    for x=1,map.max_x do  -- Clear Map
       map.tiles[x] = {}
      map.revealMap[x] = {}
@@ -165,8 +169,16 @@ function map.generateMap(player)
    player.x, player.y = map.getRandomSpot(startRoom)
    revealRoom(startRoom)
    
+   local chestRoomID = math.random(math.floor(totalRooms /2),totalRooms)  
+   --chestRoomID = 1
+   local chestRoom = map.rooms[chestRoomID]
+   treasure.addRoomChest(map,chestRoom,map.treasureLevel)
+   
+   
+   
    for i=1,map.max_rooms do
      drawRoom(map.rooms[i])
+	 
    end
    for i=1,map.max_rooms-1 do 
      drawPath(map.rooms[i],map.rooms[i+1])
@@ -177,13 +189,40 @@ end
 
 function map.getItemAt(x,y)
    for i,item in pairs(map.floorItems) do
-      if ( item.x == x and item.y == y ) then 
-      item.id = i
-      return item 
-     end
+	  item.id = i
+      if ( item.x == x and item.y == y ) then return item end
    end
 end
 
+function map.getChestAt(x,y)
+	for i,chest in pairs(map.chests) do
+		chest.id = i
+		if ( chest.x == x and chest.y == y ) then return chest end
+	end
+end
 
+function map.isFloor(x,y)
+	if ( map.tiles[x][y] == "#" ) then return false end
+	return true
+end
+
+function map.openChest(chest)
+	
+	local neighbors = {}
+	for x = chest.x-1,chest.x+1 do
+		for y = chest.y-1,chest.y+1 do
+			if map.isFloor(x,y) then table.insert(neighbors,{x=x,y=y}) end
+		end
+	end
+	for i,item in pairs(chest.contents) do
+		local spot = neighbors[math.random(#neighbors)]
+		item.x = spot.x
+		item.y = spot.y
+		table.insert(map.floorItems,item)
+	end
+	
+	table.remove(map.chests,chest.id)
+	
+end
 
 return map

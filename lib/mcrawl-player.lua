@@ -18,8 +18,9 @@ local player = {
    weapon = nil,
    armor = nil,
    
-   inventory = {}
+   inventory = {},
 
+	deathMessage = "",
    
 }
 
@@ -42,8 +43,59 @@ function player.resetPlayer()
    
    player.inventory = {}
    
+   player.foodRegenTick = 0
    
 end
+
+
+local function handleHungerRegen()
+	player.foodRegenTick = player.foodRegenTick + 1
+	if ( player.foodRegenTick >= 10 ) then
+		player.foodRegenTick = 0
+		if ( player.food <= 0 ) then player.damage(1,"hunger") end
+		local healFood = player.maxFood * 0.75
+		if ( player.food >= healFood and player.HP < player.maxHP ) then 
+			player.heal(1) 
+			player.hunger("regen")
+		end
+	
+	end
+end	
+
+function player.runHeartBeat()
+	player.hunger("heart")
+	handleHungerRegen()
+	
+end
+
+function player.death(dType)
+	player.deathMessage = "died."
+	if ( dType == "hunger" ) then player.deathMessage = "starved to death." return end
+
+end
+
+function player.damage(value,dType)
+	player.HP = player.HP - value
+	if ( player.HP <= 0 ) then player.death(dType) end
+end
+
+function player.heal(value)
+	player.HP = math.min(player.maxHP,player.HP + value)
+end
+
+
+function player.hunger(hungerType)
+	local hungerDec = 0.1
+	
+	if ( hungerType == "heart" ) then hungerDec = 0.02 end
+	if ( hungerType == "move" ) then hungerDec = 0.08 end
+	if ( hungerType == "attack" ) then hungerDec = 0.1 end
+	if ( hungerType == "regen" ) then hungerDec = 0.5 end
+	
+	player.food = math.max(0,player.food - hungerDec)
+
+end
+
 function player.equip(item)
 	if ( item == nil ) then return "What item?" end
 	local retString = "You equip " .. item.name
@@ -71,32 +123,65 @@ function player.equip(item)
 
 end
 
-function player.drink(item)
-	return "Don't drink and drive"
-end
 
-function player.craftWeapon(item)
-	return "Do what now?"
-end
-
-function player.craftArmor(item)
-	return "What a concept!"
-end
-
-function player.eat(item)
-	if ( player.food >= player.maxFood ) then 
-		return "You are too full to eat " .. item.name
-	end
-	local retString = "You eat the " .. item.name
-	player.food = math.min(player.food + item.foodvalue,player.maxFood)
+local function reduceItemQuant(item,quantity)
+	if ( quantity == nil or quantity <= 0 ) then quantity = 1 end
 	
-	
-	item.quant = item.quant - 1
+	item.quant = item.quant - quantity
 	
 	if ( item.quant <= 0 ) then
 		table.remove(player.inventory,item.id)
 	end
 	
+end
+
+function player.drink(item)
+	return "Don't drink and drive"
+end
+
+
+
+
+function player.craftWeapon(item)
+	if ( item.quant < 3 ) then return "You need 3 " .. item.name .. " to make a weapon." end
+	
+	local craftItem = items.getCraftedWeapon(item)
+	
+	if ( craftItem == nil ) then return "Something went wrong!" end
+	
+	table.insert(player.inventory,craftItem)
+	reduceItemQuant(item,3)
+	
+	return "You craft a " .. craftItem.name
+end
+
+
+
+
+function player.craftArmor(item)
+	if ( item.quant < 6 ) then return "You need 6 " .. item.name .. " to make an armor." end
+	
+	local craftItem = items.getCraftedArmor(item)
+	
+	if ( craftItem == nil ) then return "Something went wrong!" end
+	
+	table.insert(player.inventory,craftItem)
+	reduceItemQuant(item,6)
+	
+	return "You craft a " .. craftItem.name
+end
+
+
+
+function player.eat(item)
+	if ( player.food > ( player.maxFood - 1 ) ) then 
+		return "You are too full to eat " .. item.name
+	end
+	local retString = "You eat the " .. item.name
+	player.food = math.min(player.food + item.foodValue,player.maxFood)
+	
+	reduceItemQuant(item,1)
+
 	return retString
 end
 
