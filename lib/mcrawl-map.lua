@@ -113,11 +113,17 @@ local function revealTunnel(player)
    end
 end   
 
-function map.getPlayerRoom(player)
-   for i,room in pairs(map.rooms) do
-      if ( player.x >= room.x and player.x <= room.x2 and player.y >= room.y and player.y <= room.y2 ) then return room end
+
+function map.getRoomAt(x,y)
+	for i,room in pairs(map.rooms) do
+      if ( x >= room.x and x <= room.x2 and y >= room.y and y <= room.y2 ) then return room end
    end
    return 0
+
+end
+
+function map.getPlayerRoom(player)
+   return map.getRoomAt(player.x,player.y)
 end
 
 

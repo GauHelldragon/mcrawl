@@ -6,7 +6,7 @@ local unicode = require("unicode")
 local map = dofile("/usr/lib/mcrawl-map.lua")
 local player = dofile("/usr/lib/mcrawl-player.lua")
 local items = dofile("/usr/lib/mcrawl-items.lua")
-
+local monsters = dofile("/usr/lib/mcrawl-monsters.lua")
 
 
 local gpu = component.gpu
@@ -44,6 +44,11 @@ function getMapTile(x,y)
    
    if ( map.revealMap[x][y] == 0 ) then return unicode.char(9617) end
  
+   
+   local monster = map.getMonsterAt(x,y)
+   if ( monster ~= nil and monsters.hasVisibility(monster,player) ) then return monsters.getTile(monster) end
+   
+   
    local chest = map.getChestAt(x,y)
    if ( chest ~= nil ) then return unicode.char(9054) end
   
@@ -126,7 +131,7 @@ end
 
 function drawLog()
    local logI = 0
-   for y = view_max_y+3,mry do
+   for y = view_max_y+2,mry do
      term.setCursor(2,y)
     term.clearLine()
     term.setCursor(2,y)
@@ -431,7 +436,7 @@ function resolveTurn()
 	
 	infoChange = true
 	
-	-- monster AI here
+	monsters.doMonsterTurn(player)
 
 end
 
